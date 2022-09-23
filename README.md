@@ -17,6 +17,7 @@ Connect.sh connectes to the VM IP ignoring SSH messages
 
 Sample Config:
 --------------
+```
 MEMORY=8096
 VCPUS=4
 DISKSIZE=20G
@@ -24,9 +25,11 @@ NETWORK=nbmaas
 IMAGE=empty
 BOOT=network,hd
 EXTRADISKS="80G 80G 80G 80G"
+```
 
 Default Config:
 ---------------
+```
 MEMORY=8096
 VCPUS=4
 DISKSIZE=50G
@@ -34,3 +37,4 @@ NETWORK=default
 IMAGE=focal
 BOOT=hd
 TPM=no
+```
