@@ -9,6 +9,9 @@ NETWORK=default
 IMAGE=focal
 BOOT=hd
 TPM=no
+UEFI=yes
+SECUREBOOT=no
+NVME=""
 
 if [ -f config ]
 then
@@ -16,7 +19,7 @@ then
 fi
 
 virsh destroy ${VM}
-virsh undefine ${VM}
+virsh undefine ${VM} --nvram
 rm -f ${VM}-seed.img
 rm -f ${VM}.qcow2
 
@@ -53,10 +56,32 @@ EOF
     fi
 fi
 
+if [ "$NVME" != "" ]
+then
+    seq=1
+    for DISKSIZE in $NVME
+    do
+        qemu-img create -f raw nvme${seq}.img $DISKSIZE
+        chmod 666 nvme${seq}.img
+        NVMEDISKS="$NVMEDISKS --qemu-commandline='-drive file=$(pwd)/nvme${seq}.img,format=raw,if=none,id=NVME${seq}' --qemu-commandline='-device nvme,drive=NVME${seq},serial=nvme-${seq}'"
+        seq=$(($seq + 1))
+    done
+fi
+
 if [ $BOOT == 'pxe' ]
 then
     OPTIONS="$OPTIONS --pxe"
     BOOT=hd
+fi
+
+if [ $UEFI == 'yes' ]
+then
+    if [ $SECUREBOOT == 'yes' ]
+    then
+        OPTIONS="$OPTIONS --machine q35 --boot uefi,loader_secure=yes"
+    else
+        OPTIONS="$OPTIONS --boot uefi"
+    fi
 fi
 
 if [ $TPM == 'yes' ]
@@ -66,13 +91,13 @@ fi
 
 if [ $IMAGE == 'empty' ]
 then
-    CMD="virt-install $OPTIONS --osinfo detect=on,require=off --name ${VM} --memory $MEMORY --vcpus $VCPUS --disk=${VM}.qcow2,bus=virtio --network network=$NETWORK,model=virtio --boot $BOOT --noautoconsole"
+    CMD="virt-install $OPTIONS --osinfo detect=on,require=off --name ${VM} --memory $MEMORY --vcpus $VCPUS --disk=${VM}.qcow2,bus=virtio --network network=$NETWORK,model=virtio --boot $BOOT $NVMEDISKS --noautoconsole"
 else
-    CMD="virt-install $OPTIONS --osinfo detect=on,require=off --name ${VM} --memory $MEMORY --vcpus $VCPUS --disk=${VM}.qcow2,bus=virtio --disk=${VM}-seed.qcow2,bus=virtio --network network=$NETWORK,model=virtio --boot $BOOT --noautoconsole"
+    CMD="virt-install $OPTIONS --osinfo detect=on,require=off --name ${VM} --memory $MEMORY --vcpus $VCPUS --disk=${VM}.qcow2,bus=virtio --disk=${VM}-seed.qcow2,bus=virtio --network network=$NETWORK,model=virtio --boot $BOOT $NVMEDISKS --noautoconsole"
 fi
 
-echo $CMD
-$CMD
+echo $CMD | tee virt-install-cmd
+bash virt-install-cmd
 
 if [ "$EXTRADISKS" != "" ]
 then
