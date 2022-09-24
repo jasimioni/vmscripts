@@ -2,12 +2,14 @@
 
 This scripts expect a folder /vms/images/ which holds the cloud image files:
 
+```
 bionic-server-cloudimg-amd64.img
 focal-server-cloudimg-amd64.img
 focaldhclient-server-cloudimg-amd64.img
 jammy-server-cloudimg-amd64.img
 trusty-server-cloudimg-amd64.img
 xenial-server-cloudimg-amd64.img
+```
 
 Then, just create a folder (that will be the vm name) and optionally add one config file (or defaults will be used).
 
