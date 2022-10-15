@@ -21,14 +21,14 @@ fi
 virsh destroy ${VM}
 virsh undefine ${VM} --nvram
 rm -f ${VM}-seed.img
-rm -f ${VM}.qcow2
+rm -f ${VM}-vda.qcow2
 
 if [ $IMAGE == 'empty' ]
 then
-    qemu-img create -f qcow2 ${VM}.qcow2 $DISKSIZE
+    qemu-img create -f qcow2 ${VM}-vda.qcow2 $DISKSIZE
 else
-    qemu-img create -b /vms/images/$IMAGE-server-cloudimg-amd64.img -F qcow2 -f qcow2 ${VM}.qcow2
-    qemu-img resize ${VM}.qcow2 $DISKSIZE
+    qemu-img create -b /vms/images/$IMAGE-server-cloudimg-amd64.img -F qcow2 -f qcow2 ${VM}-vda.qcow2
+    qemu-img resize ${VM}-vda.qcow2 $DISKSIZE
 
     if [ ! -f user-data ]
     then
@@ -91,9 +91,9 @@ fi
 
 if [ $IMAGE == 'empty' ]
 then
-    CMD="virt-install $OPTIONS --osinfo detect=on,require=off --name ${VM} --memory $MEMORY --vcpus $VCPUS --disk=${VM}.qcow2,bus=virtio --network network=$NETWORK,model=virtio --boot $BOOT $NVMEDISKS --noautoconsole"
+    CMD="virt-install $OPTIONS --osinfo detect=on,require=off --name ${VM} --memory $MEMORY --vcpus $VCPUS --disk=${VM}-vda.qcow2,bus=virtio --network network=$NETWORK,model=virtio --boot $BOOT $NVMEDISKS --noautoconsole"
 else
-    CMD="virt-install $OPTIONS --osinfo detect=on,require=off --name ${VM} --memory $MEMORY --vcpus $VCPUS --disk=${VM}.qcow2,bus=virtio --disk=${VM}-seed.qcow2,bus=virtio --network network=$NETWORK,model=virtio --boot $BOOT $NVMEDISKS --noautoconsole"
+    CMD="virt-install $OPTIONS --osinfo detect=on,require=off --name ${VM} --memory $MEMORY --vcpus $VCPUS --disk=${VM}-vda.qcow2,bus=virtio --disk=${VM}-seed.qcow2,bus=virtio --network network=$NETWORK,model=virtio --boot $BOOT $NVMEDISKS --noautoconsole"
 fi
 
 echo $CMD | tee virt-install-cmd
