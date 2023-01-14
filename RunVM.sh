@@ -2,6 +2,17 @@
 
 VM="$(basename $(pwd))"
 
+if [ -f ${VM}-vda.qcow2 ]
+then
+    if [ "$1" == "-force" ]
+    then
+        echo "VM already exists - overriding"
+    else
+        echo "VM already exists - will not override unles -force"
+        exit
+    fi
+fi
+
 MEMORY=8096
 VCPUS=4
 DISKSIZE=50G
@@ -12,6 +23,7 @@ TPM=no
 UEFI=yes
 SECUREBOOT=no
 NVME=""
+ARCH=amd64
 
 if [ -f config ]
 then
@@ -27,7 +39,12 @@ if [ $IMAGE == 'empty' ]
 then
     qemu-img create -f qcow2 ${VM}-vda.qcow2 $DISKSIZE
 else
-    qemu-img create -b /vms/images/$IMAGE-server-cloudimg-amd64.img -F qcow2 -f qcow2 ${VM}-vda.qcow2
+    if [ $ARCH == 'arm' ]
+    then
+        qemu-img create -b /vms/images/$IMAGE-server-cloudimg-arm64.img -F qcow2 -f qcow2 ${VM}-vda.qcow2
+    else
+        qemu-img create -b /vms/images/$IMAGE-server-cloudimg-amd64.img -F qcow2 -f qcow2 ${VM}-vda.qcow2
+    fi
     qemu-img resize ${VM}-vda.qcow2 $DISKSIZE
 
     if [ ! -f user-data ]
@@ -68,6 +85,10 @@ then
     done
 fi
 
+if [ $ARCH == 'arm' ]
+then
+    OPTIONS="$OPTIONS --arch aarch64"
+fi
 if [ $BOOT == 'pxe' ]
 then
     OPTIONS="$OPTIONS --pxe"

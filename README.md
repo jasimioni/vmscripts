@@ -40,3 +40,11 @@ IMAGE=focal
 BOOT=hd
 TPM=no
 ```
+
+Hints:
+------
+Fix nested virtualization in Focal Guests
+```
+  <cpu mode='host-model' check='partial'/>
+```
+
