@@ -114,11 +114,8 @@ if [ $IMAGE == 'empty' ]
 then
     CMD="virt-install $OPTIONS --osinfo detect=on,require=off --name ${VM} --memory $MEMORY --vcpus $VCPUS --disk=${VM}-vda.qcow2,bus=virtio --network network=$NETWORK,model=virtio --boot $BOOT $NVMEDISKS --noautoconsole"
 else
-    CMD="virt-install $OPTIONS --osinfo detect=on,require=off --name ${VM} --memory $MEMORY --vcpus $VCPUS --disk=${VM}-vda.qcow2,bus=virtio --disk=${VM}-seed.qcow2,bus=virtio --network network=$NETWORK,model=virtio --boot $BOOT $NVMEDISKS --noautoconsole"
+    CMD="virt-install $OPTIONS --osinfo detect=on,require=off --name ${VM} --memory $MEMORY --vcpus $VCPUS --disk=${VM}-vda.qcow2,bus=virtio --disk=${VM}-seed.qcow2,bus=sata --network network=$NETWORK,model=virtio --boot $BOOT $NVMEDISKS --noautoconsole"
 fi
-
-echo $CMD | tee virt-install-cmd
-bash virt-install-cmd
 
 if [ "$EXTRADISKS" != "" ]
 then
@@ -129,8 +126,12 @@ then
         DISKNAME=${VM}-vd${DISK}.qcow2
         rm -f $DISKNAME
         qemu-img create -f qcow2 $DISKNAME $DISKSIZE
-        virsh attach-disk ${VM} --source $(pwd)/${DISKNAME} --target vd${DISK} --persistent --subdriver qcow2
+        # virsh attach-disk ${VM} --source $(pwd)/${DISKNAME} --target vd${DISK} --persistent --subdriver qcow2
+        CMD="$CMD --disk=${VM}-vd${DISK}.qcow2,bus=virtio"
         DISK=$(echo "$DISK" | tr "0-9a-z" "1-9a-z_")
     done
 fi
+
+echo $CMD | tee virt-install-cmd
+bash virt-install-cmd
 
