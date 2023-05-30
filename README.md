@@ -46,5 +46,8 @@ Hints:
 Fix nested virtualization in Focal Guests
 ```
   <cpu mode='host-model' check='partial'/>
+
+Fix MAAS: https://bugs.launchpad.net/maas/+bug/1876365
+
 ```
 
