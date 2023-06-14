@@ -24,6 +24,7 @@ UEFI=yes
 SECUREBOOT=no
 NVME=""
 ARCH=amd64
+EXTRAPARAMS=""
 
 if [ -f config ]
 then
@@ -115,6 +116,11 @@ then
     CMD="virt-install $OPTIONS --osinfo detect=on,require=off --name ${VM} --memory $MEMORY --vcpus $VCPUS --disk=${VM}-vda.qcow2,bus=virtio --network network=$NETWORK,model=virtio --boot $BOOT $NVMEDISKS --noautoconsole"
 else
     CMD="virt-install $OPTIONS --osinfo detect=on,require=off --name ${VM} --memory $MEMORY --vcpus $VCPUS --disk=${VM}-vda.qcow2,bus=virtio --disk=${VM}-seed.qcow2,bus=sata --network network=$NETWORK,model=virtio --boot $BOOT $NVMEDISKS --noautoconsole"
+fi
+
+if [ "$EXTRAPARAMS" != "" ]
+then
+    OPTIONS="$OPTIONS $EXTRAPARAMS"
 fi
 
 if [ "$EXTRADISKS" != "" ]
