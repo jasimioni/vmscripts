@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VM="$(basename $(pwd))"
+VM=$(pwd | sed -e 's/\//-/g' -e 's/^-//' -e 's/^vms-//')
 
 if [ $VM == 'vms' ]
 then
@@ -15,6 +15,7 @@ virsh undefine $VM --nvram
 
 if [ $1 == '-delete' ]
 then
+    DIR=$(basename $(pwd))
     cd ..
-    rm -rf $VM
+    rm -rf $DIR
 fi

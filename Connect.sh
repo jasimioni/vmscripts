@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VM="$(basename $(pwd))"
+VM=$(pwd | sed -e 's/\//-/g' -e 's/^-//' -e 's/^vms-//')
 
 for MAC in $(virsh domiflist $VM | grep 52:54 | awk '{ print $5 }')
 do
