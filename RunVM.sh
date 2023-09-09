@@ -66,11 +66,9 @@ EOF
 
     if [ -f network-data ]
     then
-	    cloud-localds --network-config=network-data ${VM}-seed.img user-data
+	    cloud-localds -d qcow2 --network-config=network-data ${VM}-seed.qcow2 user-data
     else
-	    cloud-localds ${VM}-seed.img user-data
-        qemu-img convert -O qcow2 ${VM}-seed.img ${VM}-seed.qcow2
-        rm -f ${VM}-seed.img
+	    cloud-localds -d qcow2 ${VM}-seed.qcow2 user-data
     fi
 fi
 
