@@ -13,7 +13,7 @@ then
     fi
 fi
 
-MEMORY=8096
+MEMORY=8192
 VCPUS=4
 DISKSIZE=50G
 NETWORK=default
