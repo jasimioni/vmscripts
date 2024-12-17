@@ -25,6 +25,7 @@ SECUREBOOT=no
 NVME=""
 ARCH=amd64
 EXTRAPARAMS=""
+VNC="no"
 
 if [ -f config ]
 then
@@ -83,6 +84,11 @@ then
         NVMEDISKS="$NVMEDISKS --qemu-commandline='-drive file=$(pwd)/nvme${seq}.img,format=raw,if=none,id=NVME${seq}' --qemu-commandline='-device nvme,drive=NVME${seq},serial=nvme-${seq}'"
         seq=$(($seq + 1))
     done
+fi
+
+if [ $VNC == 'yes' ]
+then
+    OPTIONS="$OPTIONS --graphics vnc,listen=0.0.0.0"
 fi
 
 if [ $ARCH == 'arm' ]
