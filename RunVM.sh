@@ -143,6 +143,7 @@ then
     done
 fi
 
+CMD="$CMD --import"
 echo $CMD | tee virt-install-cmd
 bash virt-install-cmd
 
